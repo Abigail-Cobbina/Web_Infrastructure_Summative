@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Moviesss — Find your next movie</title>
+  <link rel="icon" href="data:,">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar__inner">
+      <a href="/" class="logo">Moviesss</a>
+
+      <form class="searchbar" id="search-form" role="search">
+        <input
+          type="search"
+          id="search-input"
+          placeholder="Search movies..."
+          aria-label="Search movies"
+          autocomplete="off"
+        />
+        <button type="submit" aria-label="Search">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="7"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </button>
+      </form>
+
+      <nav class="topnav">
+        <button class="topnav__link topnav__link--active" data-view="browse">Browse</button>
+        <button class="topnav__link" data-view="favorites">Favorites</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page">
+    <section class="filters" id="filters">
+      <div class="filters__sort" id="sort-tabs">
+        <button class="pill pill--sort pill--active" data-sort="popularity">Most Popular</button>
+        <button class="pill pill--sort" data-sort="rating">Top Rated</button>
+        <button class="pill pill--sort" data-sort="newest">Newest</button>
+      </div>
+
+      <div class="filters__row">
+        <div class="filters__genres" id="genre-pills">
+          <button class="pill pill--genre pill--active" data-genre="">All Genres</button>
+        </div>
+
+        <select id="year-select" class="year-select" aria-label="Filter by year">
+          <option value="">All Years</option>
+        </select>
+      </div>
+    </section>
+
+    <h2 class="section-title" id="section-title">Browse All Movies</h2>
+
+    <p class="status" id="status" hidden></p>
+
+    <div class="grid" id="movie-grid" aria-live="polite"></div>
+
+    <nav class="pagination" id="pagination" hidden></nav>
+  </main>
+
+  <div class="modal-overlay" id="modal-overlay" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <button class="modal__close" id="modal-close" aria-label="Close">&times;</button>
+      <div class="modal__content" id="modal-content"></div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p>
+      Movie data and images provided by
+      <a href="https://www.themoviedb.org/" target="_blank" rel="noopener">The Movie Database (TMDb)</a>.
+      This product uses the TMDb API but is not endorsed or certified by TMDb.
+    </p>
+  </footer>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>

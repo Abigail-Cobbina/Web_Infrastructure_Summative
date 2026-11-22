@@ -3,6 +3,7 @@ require('dotenv').config();
 
 const express = require('express');
 const path = require('path');
+const os = require('os');
 const fetch = require('node-fetch');
 
 const app = express();
@@ -118,6 +119,14 @@ app.get('/api/movie/:id', async (req, res) => {
   } catch (err) {
     res.status(err.status || 500).json({ error: err.message });
   }
+});
+
+// GET /api/health - identify the server handling the request
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    server: os.hostname()
+  });
 });
 
 app.use((req, res) => {

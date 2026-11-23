@@ -2,11 +2,18 @@
 require('dotenv').config();
 
 const express = require('express');
+const helmet = require('helmet');
 const path = require('path');
 const os = require('os');
 const fetch = require('node-fetch');
 
 const app = express();
+
+app.use(helmet({
+  contentSecurityPolicy: false,
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+  strictTransportSecurity: false
+}));
 const PORT = process.env.PORT || 3000;
 const TMDB_API_KEY = process.env.TMDB_API_KEY;
 const TMDB_BASE = 'https://api.themoviedb.org/3';

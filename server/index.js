@@ -11,6 +11,11 @@ const PORT = process.env.PORT || 3000;
 const TMDB_API_KEY = process.env.TMDB_API_KEY;
 const TMDB_BASE = 'https://api.themoviedb.org/3';
 
+// Simple in-memory cache for TMDb responses.
+const cache = new Map();
+const CACHE_TTL_MS = 5 * 60 * 1000;
+const MAX_CACHE_ENTRIES = 500;
+
 if (!TMDB_API_KEY) {
   console.error(
     'Missing TMDB_API_KEY. Create a .env file (see .env.example) ' +
@@ -30,8 +35,27 @@ const SORT_MAP = {
 };
 
 async function tmdbGet(endpoint, params = {}) {
+  const cacheKey = JSON.stringify([
+    endpoint,
+    Object.entries(params).sort(([a], [b]) => a.localeCompare(b))
+  ]);
+
+  const cached = cache.get(cacheKey);
+
+  if (cached && cached.expiresAt > Date.now()) {
+    console.log(`TMDb cache HIT: ${endpoint}`);
+    return cached.data;
+  }
+
+  if (cached) {
+    cache.delete(cacheKey);
+  }
+
+  console.log(`TMDb cache MISS: ${endpoint}`);
+
   const url = new URL(`${TMDB_BASE}${endpoint}`);
   url.searchParams.set('api_key', TMDB_API_KEY);
+
   Object.entries(params).forEach(([key, value]) => {
     if (value !== undefined && value !== null && value !== '') {
       url.searchParams.set(key, value);
@@ -47,9 +71,18 @@ async function tmdbGet(endpoint, params = {}) {
     throw error;
   }
 
+  if (cache.size >= MAX_CACHE_ENTRIES) {
+    const oldestKey = cache.keys().next().value;
+    cache.delete(oldestKey);
+  }
+
+  cache.set(cacheKey, {
+    data,
+    expiresAt: Date.now() + CACHE_TTL_MS
+  });
+
   return data;
 }
-
 // GET /api/genres - list of movie genres
 app.get('/api/genres', async (req, res) => {
   try {

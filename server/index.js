@@ -34,6 +34,16 @@ const SORT_MAP = {
   newest: 'primary_release_date.desc',
 };
 
+// Validate positive integer inputs from API requests.
+function parsePositiveInteger(value, max = Number.MAX_SAFE_INTEGER) {
+  if (typeof value !== 'string' || !/^[1-9]\d*$/.test(value)) {
+    return null;
+  }
+
+  const number = Number(value);
+  return Number.isSafeInteger(number) && number <= max ? number : null;
+}
+
 async function tmdbGet(endpoint, params = {}) {
   const cacheKey = JSON.stringify([
     endpoint,
@@ -96,10 +106,33 @@ app.get('/api/genres', async (req, res) => {
 // GET /api/movies - browse/discover movies with filters
 app.get('/api/movies', async (req, res) => {
   try {
-    const page = Math.max(1, parseInt(req.query.page, 10) || 1);
-    const sort = SORT_MAP[req.query.sort] || SORT_MAP.popularity;
-    const genre = req.query.genre || '';
-    const year = req.query.year || '';
+    const page = req.query.page === undefined
+      ? 1 : parsePositiveInteger(req.query.page, 500);
+
+    if (page === null) {
+      return res.status(400).json({ error: 'Page must be a number between 1 and 500' });
+    }
+
+    const sortInput = req.query.sort;
+    if (sortInput !== undefined &&
+        (typeof sortInput !== 'string' || !Object.hasOwn(SORT_MAP, sortInput))) {
+      return res.status(400).json({ error: 'Invalid sort option' });
+    }
+
+    const sort = SORT_MAP[sortInput || 'popularity'];
+    const genre = req.query.genre === undefined
+      ? '' : parsePositiveInteger(req.query.genre);
+
+    if (genre === null) {
+      return res.status(400).json({ error: 'Genre must be a positive integer' });
+    }
+
+    const year = req.query.year === undefined
+      ? '' : parsePositiveInteger(req.query.year, new Date().getFullYear() + 10);
+
+    if (year === null || (year !== '' && year < 1870)) {
+      return res.status(400).json({ error: 'Invalid release year' });
+    }
 
     const params = {
       sort_by: sort,
@@ -108,7 +141,6 @@ app.get('/api/movies', async (req, res) => {
       primary_release_year: year,
     };
 
-    // Avoid obscure titles with a single 10/10 vote dominating "Top Rated".
     if (sort === SORT_MAP.rating) {
       params['vote_count.gte'] = 50;
     }
@@ -123,8 +155,22 @@ app.get('/api/movies', async (req, res) => {
 // GET /api/search - search movies by title
 app.get('/api/search', async (req, res) => {
   try {
+    if (req.query.query !== undefined && typeof req.query.query !== 'string') {
+      return res.status(400).json({ error: 'Search query must be text' });
+    }
+
     const query = (req.query.query || '').trim();
-    const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+
+    if (query.length > 100) {
+      return res.status(400).json({ error: 'Search query cannot exceed 100 characters' });
+    }
+
+    const page = req.query.page === undefined
+      ? 1 : parsePositiveInteger(req.query.page, 500);
+
+    if (page === null) {
+      return res.status(400).json({ error: 'Page must be a number between 1 and 500' });
+    }
 
     if (!query) {
       return res.json({ results: [], total_pages: 0, total_results: 0 });
@@ -140,8 +186,9 @@ app.get('/api/search', async (req, res) => {
 // GET /api/movie/:id - full details for a single movie
 app.get('/api/movie/:id', async (req, res) => {
   try {
-    const id = parseInt(req.params.id, 10);
-    if (!Number.isInteger(id) || id <= 0) {
+    const id = parsePositiveInteger(req.params.id);
+
+    if (id === null) {
       return res.status(400).json({ error: 'Invalid movie id' });
     }
 

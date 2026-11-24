@@ -53,6 +53,7 @@ You do not need to be an expert in these technologies to understand the project.
 | systemd | A Linux service manager. | Keeps the Moviesss application running. |
 | Git | A tool for tracking changes to code. | Records project development. |
 | GitHub | An online platform for storing Git repositories. | Hosts the project's source code. |
+| GitHub Actions | A tool for automating development tasks. | Runs automatic code validation when changes are pushed or pull requests are created. |
 
 ### What is an API?
 
@@ -464,7 +465,7 @@ The result is evidence of round-robin load balancing during that test.
 
 ## 8. Additional Improvements and Bonus Features
 
-In addition to the main application and deployment requirements, three useful improvements were implemented.
+In addition to the main application and deployment requirements, several useful improvements were implemented.
 
 ### 8.1 API response caching
 
@@ -537,6 +538,34 @@ curl -I http://localhost:3000
 The deployed application was also checked through the public load balancer.
 
 Helmet improves browser security, but it does not replace all application security measures. Comprehensive XSS testing and HTTPS configuration remain possible future improvements.
+
+### 8.4 Continuous Integration with GitHub Actions
+
+GitHub Actions was implemented to automatically validate the project whenever code is pushed to the repository or a pull request is created.
+
+The CI workflow performs the following steps:
+
+- Checks out the repository.
+- Sets up Node.js version 20.
+- Installs project dependencies using `npm ci`.
+- Runs `npm test` to check the JavaScript syntax of the backend and frontend files.
+
+The workflow is defined in:
+
+```text
+.github/workflows/ci.yml
+```
+
+The `npm test` command checks the syntax of:
+
+- `server/index.js`
+- `public/js/app.js`
+
+Successful workflow runs confirm that the JavaScript syntax checks have passed. This helps identify basic code errors before changes are merged into the main branch.
+
+The workflow was tested through GitHub Actions, and the checks passed for both a push and a pull request.
+
+The CI pipeline automates code validation but does not currently perform automatic deployment to the cloud servers.
 
 ---
 
@@ -616,6 +645,7 @@ Here are some common problems and possible solutions.
 | The public application does not load. | Check HAProxy, Nginx, both application services and the AWS security group rules. |
 | A request returns HTTP 400. | Check the request parameters for invalid values. |
 | The load balancer sends traffic to only one server. | Check HAProxy's backend health checks and the availability of both web servers. |
+| GitHub Actions reports a failed check. | Review the workflow logs to identify the failed validation step. |
 
 ---
 
@@ -626,7 +656,7 @@ Although the application meets its main objectives, it can be extended further.
 Possible improvements include:
 
 - Configure HTTPS using TLS certificates.
-- Create a CI/CD pipeline using GitHub Actions to automate testing and deployment.
+- Extend the existing GitHub Actions CI workflow to automate deployment.
 - Add user accounts and authentication.
 - Introduce personalised user settings.
 - Add advanced movie statistics and data visualisations.
@@ -671,20 +701,3 @@ This product uses the TMDb API but is not endorsed or certified by TMDb. Movie d
 ---
 
 Developed as part of a Software Engineering and DevOps deployment assignment.
-
-### 8.4 Continuous Integration with GitHub Actions
-
-GitHub Actions was implemented to automatically validate the project whenever code is pushed to the repository or a pull request is created.
-
-The CI workflow performs the following steps:
-
-- Checks out the repository.
-- Sets up Node.js version 20.
-- Installs project dependencies using `npm ci`.
-- Runs `npm test` to check the JavaScript syntax of the backend and frontend files.
-
-The workflow is defined in `.github/workflows/ci.yml`.
-
-Successful workflow runs confirm that the JavaScript syntax checks have passed. This helps identify basic code errors before changes are merged into the main branch.
-
-The CI pipeline automates validation but does not currently perform automatic deployment.

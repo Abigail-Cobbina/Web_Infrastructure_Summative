@@ -672,3 +672,19 @@ This product uses the TMDb API but is not endorsed or certified by TMDb. Movie d
 
 Developed as part of a Software Engineering and DevOps deployment assignment.
 
+### 8.4 Continuous Integration with GitHub Actions
+
+GitHub Actions was implemented to automatically validate the project whenever code is pushed to the repository or a pull request is created.
+
+The CI workflow performs the following steps:
+
+- Checks out the repository.
+- Sets up Node.js version 20.
+- Installs project dependencies using `npm ci`.
+- Runs `npm test` to check the JavaScript syntax of the backend and frontend files.
+
+The workflow is defined in `.github/workflows/ci.yml`.
+
+Successful workflow runs confirm that the JavaScript syntax checks have passed. This helps identify basic code errors before changes are merged into the main branch.
+
+The CI pipeline automates validation but does not currently perform automatic deployment.

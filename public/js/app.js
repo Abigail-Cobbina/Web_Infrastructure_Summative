@@ -98,7 +98,6 @@
       els.genrePills.appendChild(fragment);
     } catch (err) {
       console.error(err);
-      // Non-fatal: browsing still works without genre filters.
     }
   }
 
@@ -346,7 +345,6 @@
     els.modalContent.innerHTML = '';
   }
 
-  // --- Event wiring ---
 
   els.searchForm.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -408,7 +406,6 @@
     if (e.key === 'Escape') closeModal();
   });
 
-  // --- Init ---
 
   buildYearOptions();
   loadGenres();

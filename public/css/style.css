@@ -37,7 +37,6 @@ button {
   cursor: pointer;
 }
 
-/* Topbar */
 
 .topbar {
   position: sticky;
@@ -130,7 +129,6 @@ button {
   background: var(--surface);
 }
 
-/* Page layout */
 
 .page {
   max-width: 1280px;
@@ -148,7 +146,6 @@ button {
   border-left: 3px solid var(--accent);
 }
 
-/* Filters */
 
 .filters {
   margin-bottom: 28px;
@@ -225,7 +222,6 @@ button {
   outline: none;
 }
 
-/* Status messages */
 
 .status {
   color: var(--text-muted);
@@ -234,7 +230,6 @@ button {
   font-size: 15px;
 }
 
-/* Movie grid */
 
 .grid {
   display: grid;
@@ -305,7 +300,6 @@ button {
   padding: 0 10px 10px;
 }
 
-/* Pagination */
 
 .pagination {
   display: flex;
@@ -340,7 +334,6 @@ button {
   cursor: not-allowed;
 }
 
-/* Modal */
 
 .modal-overlay {
   position: fixed;
@@ -484,7 +477,6 @@ button {
   border-color: var(--accent);
 }
 
-/* Footer */
 
 .footer {
   border-top: 1px solid var(--border);
@@ -499,7 +491,6 @@ button {
   text-decoration: underline;
 }
 
-/* Responsive */
 
 @media (max-width: 640px) {
   .topbar__inner {

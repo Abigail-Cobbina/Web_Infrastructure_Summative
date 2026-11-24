@@ -638,7 +638,7 @@ Possible improvements include:
 
 ## 13. Demonstration Video
 
-**Demo video:** [Add your uploaded demonstration video link here.]
+**Demo video:** https://youtu.be/GnFMP0cTOxk
 
 The demonstration will show:
 

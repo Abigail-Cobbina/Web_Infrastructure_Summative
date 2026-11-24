@@ -12,8 +12,12 @@ const app = express();
 app.use(helmet({
   contentSecurityPolicy: false,
   crossOriginResourcePolicy: { policy: 'cross-origin' },
+  referrerPolicy: {
+    policy: 'strict-origin-when-cross-origin'
+  },
   strictTransportSecurity: false
 }));
+
 const PORT = process.env.PORT || 3000;
 const TMDB_API_KEY = process.env.TMDB_API_KEY;
 const TMDB_BASE = 'https://api.themoviedb.org/3';
@@ -100,6 +104,7 @@ async function tmdbGet(endpoint, params = {}) {
 
   return data;
 }
+
 // GET /api/genres - list of movie genres
 app.get('/api/genres', async (req, res) => {
   try {
@@ -117,25 +122,37 @@ app.get('/api/movies', async (req, res) => {
       ? 1 : parsePositiveInteger(req.query.page, 500);
 
     if (page === null) {
-      return res.status(400).json({ error: 'Page must be a number between 1 and 500' });
+      return res.status(400).json({
+        error: 'Page must be a number between 1 and 500'
+      });
     }
 
     const sortInput = req.query.sort;
+
     if (sortInput !== undefined &&
-        (typeof sortInput !== 'string' || !Object.hasOwn(SORT_MAP, sortInput))) {
+        (typeof sortInput !== 'string' ||
+         !Object.hasOwn(SORT_MAP, sortInput))) {
       return res.status(400).json({ error: 'Invalid sort option' });
     }
 
     const sort = SORT_MAP[sortInput || 'popularity'];
-    const genre = req.query.genre === undefined
+
+    // Empty genre means no genre filter was selected.
+    const genre = req.query.genre === undefined || req.query.genre === ''
       ? '' : parsePositiveInteger(req.query.genre);
 
     if (genre === null) {
-      return res.status(400).json({ error: 'Genre must be a positive integer' });
+      return res.status(400).json({
+        error: 'Genre must be a positive integer'
+      });
     }
 
-    const year = req.query.year === undefined
-      ? '' : parsePositiveInteger(req.query.year, new Date().getFullYear() + 10);
+    // Empty year means no release-year filter was selected.
+    const year = req.query.year === undefined || req.query.year === ''
+      ? '' : parsePositiveInteger(
+          req.query.year,
+          new Date().getFullYear() + 10
+        );
 
     if (year === null || (year !== '' && year < 1870)) {
       return res.status(400).json({ error: 'Invalid release year' });
@@ -162,25 +179,34 @@ app.get('/api/movies', async (req, res) => {
 // GET /api/search - search movies by title
 app.get('/api/search', async (req, res) => {
   try {
-    if (req.query.query !== undefined && typeof req.query.query !== 'string') {
+    if (req.query.query !== undefined &&
+        typeof req.query.query !== 'string') {
       return res.status(400).json({ error: 'Search query must be text' });
     }
 
     const query = (req.query.query || '').trim();
 
     if (query.length > 100) {
-      return res.status(400).json({ error: 'Search query cannot exceed 100 characters' });
+      return res.status(400).json({
+        error: 'Search query cannot exceed 100 characters'
+      });
     }
 
     const page = req.query.page === undefined
       ? 1 : parsePositiveInteger(req.query.page, 500);
 
     if (page === null) {
-      return res.status(400).json({ error: 'Page must be a number between 1 and 500' });
+      return res.status(400).json({
+        error: 'Page must be a number between 1 and 500'
+      });
     }
 
     if (!query) {
-      return res.json({ results: [], total_pages: 0, total_results: 0 });
+      return res.json({
+        results: [],
+        total_pages: 0,
+        total_results: 0
+      });
     }
 
     const data = await tmdbGet('/search/movie', { query, page });
@@ -202,6 +228,7 @@ app.get('/api/movie/:id', async (req, res) => {
     const data = await tmdbGet(`/movie/${id}`, {
       append_to_response: 'videos,credits',
     });
+
     res.json(data);
   } catch (err) {
     res.status(err.status || 500).json({ error: err.message });
@@ -223,3 +250,4 @@ app.use((req, res) => {
 app.listen(PORT, '127.0.0.1', () => {
   console.log(`Moviesss server running on http://localhost:${PORT}`);
 });
+

@@ -672,23 +672,3 @@ This product uses the TMDb API but is not endorsed or certified by TMDb. Movie d
 
 Developed as part of a Software Engineering and DevOps deployment assignment.
 
-## Bonus Improvements
-
-### API Response Caching
-The backend implements an in-memory cache for TMDb API responses.
-Cached responses expire after five minutes, and the cache supports
-a maximum of 500 entries to reduce repeated external API requests.
-
-### Security Improvements
-The application uses Helmet for HTTP security headers, validates
-API inputs, and stores the TMDb API key in an environment variable
-rather than exposing it in the frontend or public repository.
-
-### Personalisation
-Users can save favourite movies using browser localStorage.
-Their favourites remain available after refreshing the page.
-
-### Continuous Integration
-A GitHub Actions workflow automatically installs dependencies
-and checks JavaScript syntax when code is pushed or a pull request
-is created.
